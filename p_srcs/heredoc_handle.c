@@ -6,7 +6,7 @@
 /*   By: aelidrys <aelidrys@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/08 10:16:21 by aelidrys          #+#    #+#             */
-/*   Updated: 2023/05/13 14:59:17 by aelidrys         ###   ########.fr       */
+/*   Updated: 2023/05/17 10:39:06 by aelidrys         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ int	get_here_doc(char *str[2], char *aux[2])
 		error_handling(9, NULL);
 		return (-1);
 	}
-	if (!ft_fork(shell))
+	if (!ft_fork(shell, 1))
 	{
 		signal(SIGQUIT, SIG_IGN);
 		str[1] = get_here_str(str, 0, aux[0], aux[1]);

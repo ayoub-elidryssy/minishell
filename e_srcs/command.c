@@ -6,12 +6,28 @@
 /*   By: aelidrys <aelidrys@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 15:49:32 by aelidrys          #+#    #+#             */
-/*   Updated: 2023/05/15 17:48:40 by aelidrys         ###   ########.fr       */
+/*   Updated: 2023/05/17 11:44:57 by aelidrys         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
+void	killing(void)
+{
+	t_pid	*pid;
+
+	pid = shell->pid;
+	while (pid)
+	{
+		kill(pid->id, SIGKILL);
+		pid = pid->next;
+	}
+	stop_fill(shell->commands, NULL, NULL);
+}
+
+//  x = 0 here_doc  //
+//  x = 1 one command //
+//  x = 2 multible cmd //
 void	waiting(int x)
 {
 	if (x == 2)
@@ -20,7 +36,7 @@ void	waiting(int x)
 		while (wait(NULL) != -1)
 			;
 	}
-	while (x != 2 && wait(&shell->ex_st) != -1)
+	while (x == 1 && wait(&shell->ex_st) != -1)
 		;
 	if (WIFEXITED(shell->ex_st))
 		shell->g_status = WEXITSTATUS(shell->ex_st);
@@ -34,10 +50,14 @@ void	waiting(int x)
 			write(1, "Quit: 3\n", 8);
 		}
 	}
-	if (!x && WIFSIGNALED(shell->ex_st))
+	if (!x && wait(&shell->ex_st) != -1 && WIFSIGNALED(shell->ex_st))
+	{
+		killing();
 		shell->g_status = 1;
+	}
 	shell->flag = 0;
 }
+
 
 void	free_cmd(t_cmd *cmd)
 {
@@ -78,6 +98,7 @@ void	cmd_list(t_shell *shell)
 	t_list	*ptr1;
 
 	ptr = shell->commands;
+	printf("ptr = %p\n", ptr);
 	while (ptr)
 	{
 		add_cmd(&shell->cmd, (t_cmd *)ptr->content);
@@ -95,7 +116,7 @@ void	one_cmd(t_shell *shell, t_cmd *cmd)
 
 	if (!cmd || !cmd->cmmd || builtine(shell, cmd))
 		return ;
-	if (!ft_fork(shell))
+	if (!ft_fork(shell, 0))
 	{
 		env = convert_env(shell->env);
 		path = get_pth(shell->env, env, cmd->cmmd[0], -1);

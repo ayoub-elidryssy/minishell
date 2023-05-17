@@ -6,7 +6,7 @@
 /*   By: aelidrys <aelidrys@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/17 17:44:29 by yrimah            #+#    #+#             */
-/*   Updated: 2023/05/11 16:23:38 by aelidrys         ###   ########.fr       */
+/*   Updated: 2023/05/17 09:23:44 by aelidrys         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,14 +37,16 @@ static char	*get_substr_var(char *str, int i, t_shell *prompt)
 	char	*aux;
 	int		pos;
 	char	*path;
-	char	*var;
+	char	*var = NULL;
 
 	pos = ft_strchars_i(&str[i], "|\"\'$?>< ") + (ft_strchr("$?", str[i]) != 0);
 	if (pos == -1)
 		pos = ft_strlen(str) - 1;
 	aux = ft_substr(str, 0, i - 1);
-	var = mini_getenv(&str[i], prompt->envp, \
-		ft_strchars_i(&str[i], "\"\'$|>< "));
+	if (a_get_env(shell->env, &str[i]))
+		var = a_get_env(shell->env, &str[i])->val;
+	// var = mini_getenv(&str[i], prompt->envp, \
+	// 	ft_strchars_i(&str[i], "\"\'$|>< "));
 	if (!var && str[i] == '$')
 		var = ft_itoa(prompt->id);
 	else if (!var && str[i] == '?')

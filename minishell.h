@@ -6,7 +6,7 @@
 /*   By: aelidrys <aelidrys@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/19 11:14:59 by aelidrys          #+#    #+#             */
-/*   Updated: 2023/05/15 16:14:03 by aelidrys         ###   ########.fr       */
+/*   Updated: 2023/05/17 09:45:04 by aelidrys         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,10 +99,10 @@ void	setup_term(void);
 
 char	*get_pth(t_env *env, char **env_e, char *cmd, int n);
 void	add_pid(t_pid **list, pid_t pid1);
+pid_t	ft_fork(t_shell *shell, int s);
 void	print_error1(char *s1, int x);
 char	**spl(char*s, char c, int n);
 void	check_error(int a, int b);
-pid_t	ft_fork(t_shell *shell);
 void	ft_free(char **arry);
 void	waiting(int x);
 

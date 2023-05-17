@@ -6,7 +6,7 @@
 /*   By: aelidrys <aelidrys@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/08 10:13:46 by aelidrys          #+#    #+#             */
-/*   Updated: 2023/05/13 10:36:55 by aelidrys         ###   ########.fr       */
+/*   Updated: 2023/05/17 10:21:38 by aelidrys         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ static char	**get_trimmed(char **args)
 	return (temp);
 }
 
-static t_list	*stop_fill(t_list *cmds, char **args, char **temp)
+t_list	*stop_fill(t_list *cmds, char **args, char **temp)
 {
 	ft_lstclear(&cmds, free_nodes_content);
 	ft_free_envp(&temp);

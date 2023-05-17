@@ -142,6 +142,7 @@ char	**mini_setenv(char *var, char *value, char **envp, int n);
 char	*mini_getenv(char *var, char **envp, int n);
 
 //nodes fill
+t_list	*stop_fill(t_list *cmds, char **args, char **temp);
 t_list	*fill_nodes(char **args, int i);
 
 //heredoc

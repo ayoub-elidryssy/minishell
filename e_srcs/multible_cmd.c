@@ -6,13 +6,13 @@
 /*   By: aelidrys <aelidrys@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/18 07:14:16 by aelidrys          #+#    #+#             */
-/*   Updated: 2023/05/15 17:48:28 by aelidrys         ###   ########.fr       */
+/*   Updated: 2023/05/17 09:45:40 by aelidrys         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-pid_t	ft_fork(t_shell *shell)
+pid_t	ft_fork(t_shell *shell, int s)
 {
 	pid_t	id;
 
@@ -28,7 +28,7 @@ pid_t	ft_fork(t_shell *shell)
 		signal(SIGINT, SIG_DFL);
 		signal(SIGQUIT, SIG_DFL);
 	}
-	if (id > 0)
+	if (s && id > 0)
 		add_pid(&shell->pid, id);
 	return (id);
 }
@@ -116,7 +116,7 @@ void	multible_cmd(t_shell *shell, t_cmd *cmd, int a)
 {
 	a = list_size(cmd, 0);
 	check_error(pipe(shell->pip), dup2(shell->pip[1], 1));
-	if (ft_fork(shell) == 0)
+	if (!ft_fork(shell, 0))
 		first_cmd(shell, cmd);
 	cmd = cmd->next;
 	check_error(dup2(shell->pip[0], 0), close(shell->pip[1]));
@@ -124,13 +124,13 @@ void	multible_cmd(t_shell *shell, t_cmd *cmd, int a)
 	while (cmd->next)
 	{
 		check_error(pipe(shell->pip), dup2(shell->pip[1], 1));
-		if (ft_fork(shell) == 0)
+		if (!ft_fork(shell, 0))
 			cmd_x(shell, cmd);
 		check_error(dup2(shell->pip[0], 0), close(shell->pip[1]));
 		close(shell->pip[0]);
 		cmd = cmd->next;
 	}
-	shell->id1 = ft_fork(shell);
+	shell->id1 = ft_fork(shell, 0);
 	if (shell->id1 == 0)
 		last_cmd(shell, cmd);
 	check_error(dup2(shell->old_out, 1), dup2(shell->old_in, 0));
