@@ -6,7 +6,7 @@
 /*   By: aelidrys <aelidrys@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 15:49:32 by aelidrys          #+#    #+#             */
-/*   Updated: 2023/05/13 14:04:33 by aelidrys         ###   ########.fr       */
+/*   Updated: 2023/05/15 17:48:40 by aelidrys         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,21 +97,21 @@ void	one_cmd(t_shell *shell, t_cmd *cmd)
 		return ;
 	if (!ft_fork(shell))
 	{
-		path = get_pth(shell->env, cmd->cmmd[0], -1);
+		env = convert_env(shell->env);
+		path = get_pth(shell->env, env, cmd->cmmd[0], -1);
 		if (!path)
 		{
 			a_printf("minishell: %s%s\n", cmd->cmmd[0],
 				": command not found", 2);
 			exit(127);
 		}
-		env = convert_env(shell->env);
 		if (cmd->in >= 0 && dup2(cmd->in, 0) == -1)
 			print_error1("minishell: Error in dup1\n", 1);
 		if (cmd->out >= 0 && dup2(cmd->out, 1) == -1)
 			print_error1("minishell: Error in dup2\n", 1);
 		execve(path, cmd->cmmd, env);
 		a_printf("minishell: %s%s\n", cmd->cmmd[0], ": command not found", 2);
-		exit(126);
+		exit(127);
 	}
 	waiting(1);
 }

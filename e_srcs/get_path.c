@@ -6,7 +6,7 @@
 /*   By: aelidrys <aelidrys@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 07:47:02 by aelidrys          #+#    #+#             */
-/*   Updated: 2023/05/12 11:16:12 by aelidrys         ###   ########.fr       */
+/*   Updated: 2023/05/15 16:11:55 by aelidrys         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	ft_free(char **arry)
 	free(arry);
 }
 
-char	*get_pth(t_env *env, char *cmd, int n)
+char	*get_pth(t_env *env, char **env_e, char *cmd, int n)
 {
 	char	*path;
 	char	**s;
@@ -31,7 +31,12 @@ char	*get_pth(t_env *env, char *cmd, int n)
 	if (!env || !cmd)
 		return (0);
 	if (!access(cmd, X_OK))
-		return (cmd);
+		execve(cmd, shell->cmd->cmmd, env_e);
+	if (opendir(cmd))
+	{
+		a_printf("minishell: %s%s\n", cmd, ": is a directory", 2);
+		exit(126);
+	}
 	env1 = a_get_env(env, "PATH");
 	if (!env1)
 		return (NULL);

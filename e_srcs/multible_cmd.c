@@ -6,7 +6,7 @@
 /*   By: aelidrys <aelidrys@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/18 07:14:16 by aelidrys          #+#    #+#             */
-/*   Updated: 2023/05/13 13:52:00 by aelidrys         ###   ########.fr       */
+/*   Updated: 2023/05/15 17:48:28 by aelidrys         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,16 +47,16 @@ void	first_cmd(t_shell *shell, t_cmd *cmd)
 		print_error1("minishell: Error in first_dup\n", 1);
 	if (builtine(shell, cmd))
 		exit(shell->g_status);
-	path = get_pth(shell->env, cmd->cmmd[0], -1);
+	env = convert_env(shell->env);
+	path = get_pth(shell->env, env, cmd->cmmd[0], -1);
 	if (!path)
 	{
 		a_printf("minishell: %s%s\n", cmd->cmmd[0], ": command not found", 2);
 		exit (127);
 	}
-	env = convert_env(shell->env);
 	execve(path, cmd->cmmd, env);
 	a_printf("minishell: %s%s\n", cmd->cmmd[0], ": command not found", 2);
-	exit(126);
+	exit(127);
 }
 
 void	cmd_x(t_shell *shell, t_cmd *cmd)
@@ -74,16 +74,16 @@ void	cmd_x(t_shell *shell, t_cmd *cmd)
 		check_error(close(shell->pip[1]), close(shell->pip[0]));
 	if (builtine(shell, cmd))
 		exit(shell->g_status);
-	path = get_pth(shell->env, cmd->cmmd[0], -1);
+	env = convert_env(shell->env);
+	path = get_pth(shell->env, env, cmd->cmmd[0], -1);
 	if (!path)
 	{
 		a_printf("minishell: %s%s\n", cmd->cmmd[0], ": command not found", 2);
 		exit(127);
 	}
-	env = convert_env(shell->env);
 	execve(path, cmd->cmmd, env);
 	a_printf("minishell: %s%s\n", cmd->cmmd[0], ": command not found", 2);
-	exit(126);
+	exit(127);
 }
 
 void	last_cmd(t_shell *shell, t_cmd *cmd)
@@ -100,16 +100,16 @@ void	last_cmd(t_shell *shell, t_cmd *cmd)
 		print_error1("minishell: Error in last_dup\n", 1);
 	if (builtine(shell, cmd))
 		exit(shell->g_status);
-	path = get_pth(shell->env, cmd->cmmd[0], -1);
+	env = convert_env(shell->env);
+	path = get_pth(shell->env, env, cmd->cmmd[0], -1);
 	if (!path)
 	{
 		a_printf("minishell: %s%s\n", cmd->cmmd[0], ": command not found", 2);
 		exit(127);
 	}
-	env = convert_env(shell->env);
 	execve(path, cmd->cmmd, env);
 	a_printf("minishell: %s%s\n", cmd->cmmd[0], ": command not found", 2);
-	exit(126);
+	exit(127);
 }
 
 void	multible_cmd(t_shell *shell, t_cmd *cmd, int a)
