@@ -6,7 +6,7 @@
 /*   By: aelidrys <aelidrys@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 15:49:32 by aelidrys          #+#    #+#             */
-/*   Updated: 2023/05/17 11:44:57 by aelidrys         ###   ########.fr       */
+/*   Updated: 2023/05/18 16:51:27 by aelidrys         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,6 @@ void	cmd_list(t_shell *shell)
 	t_list	*ptr1;
 
 	ptr = shell->commands;
-	printf("ptr = %p\n", ptr);
 	while (ptr)
 	{
 		add_cmd(&shell->cmd, (t_cmd *)ptr->content);
@@ -114,7 +113,7 @@ void	one_cmd(t_shell *shell, t_cmd *cmd)
 	char	*path;
 	char	**env;
 
-	if (!cmd || !cmd->cmmd || builtine(shell, cmd))
+	if (!cmd || !cmd->cmmd || builtine(shell, cmd) || cmd->s == -1)
 		return ;
 	if (!ft_fork(shell, 0))
 	{

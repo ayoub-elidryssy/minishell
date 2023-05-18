@@ -42,6 +42,7 @@ enum	e_errros
 
 typedef struct s_cmd
 {
+	int				s;
 	int				in;
 	int				out;
 	char			*path;

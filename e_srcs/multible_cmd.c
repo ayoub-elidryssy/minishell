@@ -6,7 +6,7 @@
 /*   By: aelidrys <aelidrys@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/18 07:14:16 by aelidrys          #+#    #+#             */
-/*   Updated: 2023/05/17 09:45:40 by aelidrys         ###   ########.fr       */
+/*   Updated: 2023/05/18 16:52:28 by aelidrys         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void	first_cmd(t_shell *shell, t_cmd *cmd)
 	char	*path;
 	char	**env;
 
-	if (!cmd || !cmd->cmmd)
+	if (!cmd || !cmd->cmmd || cmd->s == -1)
 		exit(1);
 	if (!str_comp(cmd->cmmd[0], "./minishell"))
 		check_error(close(shell->pip[0]), close(shell->pip[1]));
@@ -64,7 +64,7 @@ void	cmd_x(t_shell *shell, t_cmd *cmd)
 	char	*path;
 	char	**env;
 
-	if (!cmd || !cmd->cmmd)
+	if (!cmd || !cmd->cmmd || cmd->s == -1)
 		exit(1);
 	if ((cmd->out >= 0 && dup2(cmd->out, 1) == -1))
 		print_error1("minishell: Error in dup or close\n", 1);
@@ -91,7 +91,7 @@ void	last_cmd(t_shell *shell, t_cmd *cmd)
 	char	*path;
 	char	**env;
 
-	if (!cmd || !cmd->cmmd)
+	if (!cmd || !cmd->cmmd || cmd->s == -1)
 		exit(1);
 	check_error(dup2(shell->old_out, 1), 0);
 	if (cmd->out >= 0 && dup2(cmd->out, 1) == -1)
@@ -135,5 +135,4 @@ void	multible_cmd(t_shell *shell, t_cmd *cmd, int a)
 		last_cmd(shell, cmd);
 	check_error(dup2(shell->old_out, 1), dup2(shell->old_in, 0));
 	waiting(2);
-	check_error(dup2(shell->old_out, 1), dup2(shell->old_in, 0));
 }

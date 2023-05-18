@@ -6,7 +6,7 @@
 /*   By: aelidrys <aelidrys@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/08 10:13:46 by aelidrys          #+#    #+#             */
-/*   Updated: 2023/05/17 10:21:38 by aelidrys         ###   ########.fr       */
+/*   Updated: 2023/05/18 17:41:51 by aelidrys         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,8 @@ t_list	*fill_nodes(char **args, int i)
 
 	cmds[0] = NULL;
 	temp[1] = get_trimmed(args);
+	// for (int a = 0; args[a]; a++)
+	// 	printf("str = %s\n", args[a]);
 	while (args[++i])
 	{
 		cmds[1] = ft_lstlast(cmds[0]);
@@ -96,9 +98,15 @@ t_list	*fill_nodes(char **args, int i)
 			cmds[1] = ft_lstlast(cmds[0]);
 		}
 		temp[0] = args;
+		int j = i;
 		cmds[1]->content = get_params(cmds[1]->content, temp, &i);
-		if (i < 0)
-			return (stop_fill(cmds[0], args, temp[1]));
+		if (i < 0){
+			((t_cmd *)cmds[1]->content)->s = -1;
+			i = j;
+			while (args[i] && args[i + 1] && !str_comp(args[i + 1], "|"))
+				i++;
+		}
+		// return (stop_fill(cmds[0], args, temp[1]));
 		if (!args[i])
 			break ;
 	}
