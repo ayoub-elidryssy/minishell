@@ -40,6 +40,12 @@ enum	e_errros
 };
 
 
+typedef struct s_herdoc
+{
+	int					in;
+	struct s_herdoc	*next;
+}	t_herdoc;
+
 typedef struct s_cmd
 {
 	int				s;
@@ -86,6 +92,7 @@ typedef struct s_shell
 	t_list			*commands;
 	t_env			*env;
 	t_cmd			*cmd;
+	t_herdoc		*hdc;
 	t_pid			*pid;
 }	t_shell;
 
@@ -137,6 +144,7 @@ t_cmd	*get_outf1(t_cmd *node, char **args, int *i);
 t_cmd	*get_outf2(t_cmd *node, char **args, int *i);
 t_cmd	*get_inf1(t_cmd *node, char **args, int *i);
 t_cmd	*get_inf2(t_cmd *node, char **args, int *i);
+int		get_infile2(char **args, int *i);
 
 //set-get env
 char	**mini_setenv(char *var, char *value, char **envp, int n);
@@ -147,10 +155,13 @@ t_list	*stop_fill(t_list *cmds, char **args, char **temp);
 t_list	*fill_nodes(char **args, int i);
 
 //heredoc
-int	get_here_doc(char *str[2], char *aux[2]);
+int		get_here_doc(char *str[2], char *aux[2]);
+void	add_herdoc(t_herdoc **lst, int in);
+int		open_here_doc(char **args, int a);
+
 
 //signal
-void	signal_handle(int signal);
+// void	signal_handle(int signal);
 
 char	*expand_path(char *str, int i, int quotes[2], char *var);
 char	*expand_vars(char *str, int i, int quotes[2], t_shell *prompt);

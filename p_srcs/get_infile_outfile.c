@@ -6,7 +6,7 @@
 /*   By: aelidrys <aelidrys@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/08 10:16:01 by aelidrys          #+#    #+#             */
-/*   Updated: 2023/05/18 17:41:33 by aelidrys         ###   ########.fr       */
+/*   Updated: 2023/05/19 15:30:56 by aelidrys         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,4 +133,33 @@ t_cmd	*get_inf2(t_cmd *node, char **args, int *i)
 		}
 	}
 	return (node);
+}
+
+int	get_infile2(char **args, int *i)
+{
+	int		in;
+	char	*aux[2];
+	char	*str[2];
+
+	in = -2;
+	str[0] = NULL;
+	str[1] = NULL;
+	aux[0] = NULL;
+	aux[1] = "minishell: warning: here-document delimited by end-of-file";
+	(*i)++;
+	if (args[++(*i)])
+	{
+		aux[0] = args[*i];
+		in = get_here_doc(str, aux);
+	}
+	if (!args[*i] || in == -1)
+	{
+		*i = -1;
+		if (in != -1)
+		{
+			ft_putendl_fd("minishell: syntax error near unexpected token `newline'\n", 2);
+			shell->g_status = 2;
+		}
+	}
+	return (in);
 }

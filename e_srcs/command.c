@@ -6,7 +6,7 @@
 /*   By: aelidrys <aelidrys@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 15:49:32 by aelidrys          #+#    #+#             */
-/*   Updated: 2023/05/18 16:51:27 by aelidrys         ###   ########.fr       */
+/*   Updated: 2023/05/19 18:05:25 by aelidrys         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,11 +50,11 @@ void	waiting(int x)
 			write(1, "Quit: 3\n", 8);
 		}
 	}
-	if (!x && wait(&shell->ex_st) != -1 && WIFSIGNALED(shell->ex_st))
-	{
-		killing();
-		shell->g_status = 1;
-	}
+	// if (!x && wait(&shell->ex_st) != -1 && WIFSIGNALED(shell->ex_st))
+	// {
+	// 	killing();
+	// 	shell->g_status = 1;
+	// }
 	shell->flag = 0;
 }
 

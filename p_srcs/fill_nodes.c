@@ -6,7 +6,7 @@
 /*   By: aelidrys <aelidrys@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/08 10:13:46 by aelidrys          #+#    #+#             */
-/*   Updated: 2023/05/18 17:41:51 by aelidrys         ###   ########.fr       */
+/*   Updated: 2023/05/19 18:17:11 by aelidrys         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,15 +29,22 @@ static t_cmd	*mini_init(void)
 
 static t_cmd	*get_params(t_cmd *node, char **a[2], int *i)
 {
+	t_herdoc	*tmp;
+
 	if (a[0][*i])
 	{
 		if (a[0][*i][0] == '>' && a[0][*i + 1] && a[0][*i + 1][0] == '>')
 			node = get_outf2(node, a[1], i);
 		else if (a[0][*i][0] == '>')
 			node = get_outf1(node, a[1], i);
-		else if (a[0][*i][0] == '<' && a[0][*i + 1] && \
-			a[0][*i + 1][0] == '<')
-			node = get_inf2(node, a[1], i);
+		else if (a[0][*i][0] == '<' && a[0][*i + 1][0] == '<')
+		{
+			tmp = shell->hdc;
+			node->in = shell->hdc->in;
+			shell->hdc = shell->hdc->next;
+			free(tmp);
+			*i += 2;
+		}
 		else if (a[0][*i][0] == '<')
 			node = get_inf1(node, a[1], i);
 		else if (a[0][*i][0] != '|')
@@ -79,6 +86,8 @@ t_list	*stop_fill(t_list *cmds, char **args, char **temp)
 	return (NULL);
 }
 
+
+
 t_list	*fill_nodes(char **args, int i)
 {
 	t_list	*cmds[2];
@@ -86,8 +95,8 @@ t_list	*fill_nodes(char **args, int i)
 
 	cmds[0] = NULL;
 	temp[1] = get_trimmed(args);
-	// for (int a = 0; args[a]; a++)
-	// 	printf("str = %s\n", args[a]);
+	if (!open_here_doc(args, -1))
+		return (NULL);
 	while (args[++i])
 	{
 		cmds[1] = ft_lstlast(cmds[0]);
@@ -106,7 +115,6 @@ t_list	*fill_nodes(char **args, int i)
 			while (args[i] && args[i + 1] && !str_comp(args[i + 1], "|"))
 				i++;
 		}
-		// return (stop_fill(cmds[0], args, temp[1]));
 		if (!args[i])
 			break ;
 	}
