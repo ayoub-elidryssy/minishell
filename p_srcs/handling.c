@@ -12,8 +12,6 @@
 
 #include "../minishell.h"
 
-// extern int	g_status;
-
 void	*error_handling(int error, char *param)
 {
 	if (error == 1)
@@ -26,6 +24,14 @@ void	*error_handling(int error, char *param)
 		ft_putstr_fd("minishell: error creating pipe\n", 2);
 	else if (error == 10)
 		ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", 2);
+	else if (error == 11)
+		ft_putstr_fd("minishell: syntax error near unexpected token `<'\n", 2);
+	else if (error == 12)
+		ft_putstr_fd("minishell: syntax error near unexpected token `>'\n", 2);
+	else if (error == 13)
+		ft_putstr_fd("minishell: syntax error near unexpected token `<<'\n", 2);
+	else if (error == 14)
+		ft_putstr_fd("minishell: syntax error near unexpected token `>>'\n", 2);
 	if (error != 2 && error != 3)
 		ft_putstr_fd(param, 2);
 	return (NULL);

@@ -6,170 +6,89 @@
 /*   By: aelidrys <aelidrys@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/17 17:44:29 by yrimah            #+#    #+#             */
-/*   Updated: 2023/05/17 14:22:34 by aelidrys         ###   ########.fr       */
+/*   Updated: 2023/05/27 18:27:51 by aelidrys         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-char	*mini_getenv(char *var, char **envp, int n)
+static char	*y_get_env(char *var, t_env *env, int n, int *index)
 {
-	int	i;
-	int	n2;
+	char	*tmp;
+	int		n2;
 
-	i = 0;
 	if (n < 0)
 		n = ft_strlen(var);
-	while (!ft_strchr(var, '=') && envp && envp[i])
+	while (var && env)
 	{
 		n2 = n;
-		if (n2 < ft_strchr_i(envp[i], '='))
-			n2 = ft_strchr_i(envp[i], '=');
-		if (!ft_strncmp(envp[i], var, n2))
-			return (ft_substr(envp[i], n2 + 1, ft_strlen(envp[i])));
-		i++;
+		if (n2 < ft_strchars_i(env->key, "\"\'$|>< "))
+			n2 = ft_strchars_i(env->key, "\"\'$|>< ");
+		tmp = ft_substr(var, 0, n2);
+		if (!ft_strncmp(env->key, var, n2) && str_comp(env->key, tmp))
+		{
+			free(tmp);
+			return (ft_substr(env->val, 0, ft_strlen(env->val)));
+		}
+		if (tmp)
+			free(tmp);
+		*index = n2;
+		env = env->next;
 	}
 	return (NULL);
 }
 
-static char	*get_substr_var(char *str, int i, t_shell *prompt)
+static char	*get_substr_var(char *str, int i)
 {
 	char	*aux;
-	int		pos;
 	char	*path;
-	char	*var = NULL;
+	char	*var;
+	int		pos;
+	int		index;
 
+	var = NULL;
 	pos = ft_strchars_i(&str[i], "|\"\'$?>< ") + (ft_strchr("$?", str[i]) != 0);
 	if (pos == -1)
 		pos = ft_strlen(str) - 1;
 	aux = ft_substr(str, 0, i - 1);
-	if (a_get_env(shell->env, &str[i]))
-		var = ft_strdup(a_get_env(shell->env, &str[i])->val);
-	// var = mini_getenv(&str[i], prompt->envp, \
-	// 	ft_strchars_i(&str[i], "\"\'$|>< "));
+	index = 0;
+	var = y_get_env(&str[i], g_shell->env, \
+		ft_strchars_i(&str[i], "\"\'-+*.,:=~@#!<>$?^&|{}][%/ "), &index);
 	if (!var && str[i] == '$')
-		var = ft_itoa(prompt->id);
+		var = ft_itoa(g_shell->id);
 	else if (!var && str[i] == '?')
-		var = ft_itoa(shell->g_status);
-	path = ft_strjoin(aux, var);
+		var = ft_itoa(g_shell->g_status);
+	else
+		var = after_env_var(str, &i, &index, var);
+	path = a_strjoin(aux, var, 0, 0);
 	free(aux);
-	aux = ft_strjoin(path, &str[i + pos]);
-	free(var);
-	free(path);
-	free(str);
+	aux = ft_strdup(path);
+	help_free2(var, path, str);
 	return (aux);
 }
 
-// char	*expand_vars(char *str, int i, int quotes[2], t_shell *prompt)
-// {
-// 	quotes[0] = 0;
-// 	quotes[1] = 0;
-// 	while (str && str[++i])
-// 	{
-// 		quotes[0] = (quotes[0] + (!quotes[1] && str[i] == '\'')) % 2;
-// 		quotes[1] = (quotes[1] + (!quotes[0] && str[i] == '\"')) % 2;
-// 		if (!quotes[0] && str[i] == '$' && str[i + 1] && \
-// 			((ft_strchars_i(&str[i + 1], "/~%^{}:; ") && !quotes[1]) || \
-// 			(ft_strchars_i(&str[i + 1], "/~%^{}:;\"") && quotes[1])))
-// 			return (expand_vars(get_substr_var(str, ++i, prompt), -1, \
-// 				quotes, prompt));
-// 	}
-// 	return (str);
-// }
-
-// char	*expand_vars(char *str, int i, int quotes[2], t_shell *prompt)
-// {
-// 	quotes[0] = 0;
-// 	quotes[1] = 0;
-// 	while (str && str[++i])
-// 	{
-// 		quotes[0] += (!quotes[1] && str[i] == '\'');
-// 		quotes[1] += (!quotes[0] && str[i] == '\"');
-// 		if (quotes[0] % 2 == 0 && quotes[1] % 2 == 0 && str[i] == '$' && str[i + 1])
-// 		{
-// 			if (ft_strchars_i("/~%^{}:; ", &str[i + 1]) && !quotes[1])
-// 				return (expand_vars(get_substr_var(str, ++i, prompt), -1, quotes, prompt));
-// 			if (ft_strchars_i("/~%^{}:;\"", &str[i + 1]) && quotes[1])
-// 				return (expand_vars(get_substr_var(str, ++i, prompt), -1, quotes, prompt));
-// 		}
-// 	}
-// 	return (str);
-// }
-
-char	*expand_vars(char *str, int i, int quotes[2], t_shell *prompt)
+char	*expand_vars(char *str, int i, int quotes[2], int q)
 {
-    quotes[0] = 0;
-    quotes[1] = 0;
-    while (str && str[++i])
-    {
-        quotes[0] += (!quotes[1] && str[i] == '\'');
-        quotes[1] += (!quotes[0] && str[i] == '\"');
-        if (quotes[0] % 2 == 0 && str[i] == '$' && str[i + 1])
-        {
-            if (!quotes[1] && ft_strchars_i("/~%^{}:; ", &str[i + 1]))
-                return (expand_vars(get_substr_var(str, ++i, prompt), -1, quotes, prompt));
-            else if (quotes[1] && ft_strchars_i("/~%^{}:;\"", &str[i + 1]))
-                return (expand_vars(get_substr_var(str, ++i, prompt), -1, quotes, prompt));
-        }
-    }
-    return (str);
+	quotes[0] = 0;
+	quotes[1] = 0;
+	while (str && str[++i])
+	{
+		quotes[0] += (!quotes[1] && str[i] == '\'');
+		quotes[1] += (!quotes[0] && str[i] == '\"');
+		if (q)
+			quotes[0] = 0;
+		if (str[i] && quotes[0] % 2 == 0 && str[i] == '$' && str[i + 1])
+		{
+			if (!quotes[1] && ft_strchars_i("~%^{}:;<> ", &str[i + 1]))
+				return (expand_vars(get_substr_var(str, ++i),
+						-1, quotes, q));
+			else if (quotes[1] && ft_strchars_i("~%^{}:;<>\"", &str[i + 1]))
+				return (expand_vars(get_substr_var(str, ++i),
+						-1, quotes, q));
+		}
+	}
+	return (str);
 }
-
-// char	*expand_vars(char *str, int i, int quotes[2], t_shell *prompt, char *heredoc_delim)
-// {
-//     quotes[0] = 0;
-//     quotes[1] = 0;
-//     while (str && str[++i])
-//     {
-//         quotes[0] += (!quotes[1] && str[i] == '\'');
-//         quotes[1] += (!quotes[0] && str[i] == '\"');
-//         if (quotes[0] % 2 == 0 && quotes[1] % 2 == 0 && str[i] == '$' && str[i + 1])
-//         {
-//             if (ft_strchars_i("/~%^{}:; ", &str[i + 1]) && !quotes[1])
-//             {
-//                 char *var = get_substr_var(str, ++i, prompt);
-//                 if (!heredoc_delim || ft_strcmp(var, heredoc_delim) != 0)
-//                     return (expand_vars(var, -1, quotes, prompt, heredoc_delim));
-//             }
-//             if (ft_strchars_i("/~%^{}:;\"", &str[i + 1]) && quotes[1])
-//             {
-//                 char *var = get_substr_var(str, ++i, prompt);
-//                 if (!heredoc_delim || ft_strcmp(var, heredoc_delim) != 0)
-//                     return (expand_vars(var, -1, quotes, prompt, heredoc_delim));
-//             }
-//         }
-//     }
-//     return (str);
-// }
-
-// char	*expand_vars(char *str, int i, int quotes[2], t_shell *shell)
-// {
-// 	quotes[0] = 0;
-// 	quotes[1] = 0;
-// 	while (str && str[++i])
-// 	{
-// 		quotes[0] += (!quotes[1] && str[i] == '\'');
-// 		quotes[1] += (!quotes[0] && str[i] == '\"');
-// 		if (shell->in_heredoc && !ft_strncmp(&str[i], shell->heredoc_delim, ft_strlen(shell->heredoc_delim)))
-// 		{
-// 			if (i > 0 && str[i - 1] == '\\')
-// 				continue;
-// 			shell->in_heredoc = 0;
-// 			i += ft_strlen(shell->heredoc_delim) - 1;
-// 			continue;
-// 		}
-// 		if (quotes[0] % 2 == 0 && str[i] == '$' && str[i + 1])
-// 		{
-// 			if (ft_strchars_i("/~%^{}:; ", &str[i + 1]) && !quotes[1])
-// 				str = expand_vars(get_substr_var(str, ++i, shell), -1, quotes, shell);
-// 			else if (ft_strchars_i("/~%^{}:;\"", &str[i + 1]) && quotes[1])
-// 				str = expand_vars(get_substr_var(str, ++i, shell), -1, quotes, shell);
-// 		}
-// 	}
-// 	return (str);
-// }
-
-
 
 char	*expand_path(char *str, int i, int quotes[2], char *var)
 {
@@ -182,9 +101,8 @@ char	*expand_path(char *str, int i, int quotes[2], char *var)
 	{
 		quotes[0] = (quotes[0] + (!quotes[1] && str[i] == '\'')) % 2;
 		quotes[1] = (quotes[1] + (!quotes[0] && str[i] == '\"')) % 2;
-		// if (!quotes[0] && !quotes[1] && str[i] == '~' && (i == 0 || \
-		// 	str[i - 1] != '$' || str[i - 1] == ' '))
-		if (!quotes[0] && !quotes[1] && str[i] == '~' && (i == 0 || str[i - 1] == ' ' || str[i - 1] == '$'))
+		if (!quotes[0] && !quotes[1] && str[i] == '~'
+			&& (i == 0 || str[i - 1] == ' ' || str[i - 1] == '$'))
 		{
 			aux = ft_substr(str, 0, i);
 			path = ft_strjoin(aux, var);
