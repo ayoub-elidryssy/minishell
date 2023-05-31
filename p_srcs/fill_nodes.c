@@ -6,7 +6,7 @@
 /*   By: aelidrys <aelidrys@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/08 10:13:46 by aelidrys          #+#    #+#             */
-/*   Updated: 2023/05/27 18:27:51 by aelidrys         ###   ########.fr       */
+/*   Updated: 2023/05/29 19:27:43 by aelidrys         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ static t_cmd	*handle_redirection(t_cmd *node, char **a[2], int *i)
 		error_handling(12, NULL);
 		g_shell->g_status = 258;
 		node->out = -1;
+		*i = -3;
 		return (node);
 	}
 	else if (str_comp(&a[0][*i + 2][0], "<"))
@@ -26,6 +27,7 @@ static t_cmd	*handle_redirection(t_cmd *node, char **a[2], int *i)
 		error_handling(11, NULL);
 		g_shell->g_status = 258;
 		node->out = -1;
+		*i = -3;
 		return (node);
 	}
 	else
@@ -69,7 +71,8 @@ static t_cmd	*check_redirect(t_cmd *node, char **a[2], int *i)
 		else
 		{
 			error_handling(10, NULL);
-			*i = -2;
+			g_shell->g_status = 258;
+			*i = -3;
 		}
 		return (node);
 	}
@@ -91,13 +94,14 @@ t_list	*fill_nodes(char **args, int i)
 		help_fill2(cmds, &i, args, &temp[0]);
 		j = i;
 		cmds[1]->content = check_redirect(cmds[1]->content, temp, &i);
+		if (i == -3)
+			return (stop_fill(cmds[0], args, temp[1]));
 		if (i < 0)
 		{
 			((t_cmd *)cmds[1]->content)->s = -1;
 			i = j;
 			while (args[i] && args[i + 1] && !str_comp(args[i + 1], "|"))
 				i++;
-			return (stop_fill(cmds[0], args, temp[1]));
 		}
 		if (!args[i])
 			break ;

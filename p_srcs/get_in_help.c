@@ -1,34 +1,39 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   signals.c                                          :+:      :+:    :+:   */
+/*   get_in_help.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aelidrys <aelidrys@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/03/21 07:49:23 by aelidrys          #+#    #+#             */
-/*   Updated: 2023/05/31 13:38:06 by aelidrys         ###   ########.fr       */
+/*   Created: 2023/05/28 17:34:44 by yrimah            #+#    #+#             */
+/*   Updated: 2023/05/29 19:07:53 by aelidrys         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void	sigint_hand(int sig)
+void	get_in_help1(int *i, int flags[2])
 {
-	sig = 0;
-	if (g_shell->flag)
-		return ;
-	write(1, "\n", 1);
-	rl_on_new_line();
-	rl_replace_line("", 0);
-	rl_redisplay();
-	g_shell->g_status = 1;
+	flags[0] = 1;
+	flags[1] = 1;
+	(*i)++;
 }
 
-void	setup_term(void)
+void	get_in_help2(int flags[2], char **error)
 {
-	struct termios	t;
+	flags[0] = 0;
+	flags[1] = 0;
+	*error = "minishell: syntax error near unexpected token `newline'";
+}
 
-	tcgetattr(STDIN_FILENO, &t);
-	t.c_lflag &= ~ECHOCTL;
-	tcsetattr(STDIN_FILENO, TCSANOW, &t);
+void	get_in_help3(int *i, t_cmd *node, char **error)
+{
+	*i = -1;
+	if (node->in != -1)
+	{
+		ft_putendl_fd(*error, 2);
+		g_shell->g_status = 258;
+	}
+	else
+		g_shell->g_status = 1;
 }

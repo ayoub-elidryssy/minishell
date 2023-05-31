@@ -6,7 +6,7 @@
 /*   By: aelidrys <aelidrys@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/17 17:44:29 by yrimah            #+#    #+#             */
-/*   Updated: 2023/05/27 18:27:51 by aelidrys         ###   ########.fr       */
+/*   Updated: 2023/05/29 19:21:58 by aelidrys         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ static char	*y_get_env(char *var, t_env *env, int n, int *index)
 		if (n2 < ft_strchars_i(env->key, "\"\'$|>< "))
 			n2 = ft_strchars_i(env->key, "\"\'$|>< ");
 		tmp = ft_substr(var, 0, n2);
+		*index = n2;
 		if (!ft_strncmp(env->key, var, n2) && str_comp(env->key, tmp))
 		{
 			free(tmp);
@@ -32,7 +33,6 @@ static char	*y_get_env(char *var, t_env *env, int n, int *index)
 		}
 		if (tmp)
 			free(tmp);
-		*index = n2;
 		env = env->next;
 	}
 	return (NULL);
